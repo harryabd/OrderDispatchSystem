@@ -27,6 +27,7 @@ class Batch
      */
     public bool $isOpen;
 
+
     /**
      * __construct
      *
@@ -65,24 +66,24 @@ class Batch
      * @return boolean
      */
     public function addConsignment(\PDO $dbh, Consignment $consignment) : bool {
-        // Save consignment to table
         $this->consignments[] = $consignment;
+        // Save consignment to table
+
+        $success = true; // ($success = migration success)
+        return $success;
     }
 
     /**
-     * processSends
+     * queueConsignmentSends
      * Method to be called when batch is to be processed
-     * Sends consignment and
+     * Queues all consignment
      *
      * @param \PDO $dbh
-     * @return boolean
      */
-    public function processSends(\PDO $dbh) : bool {
+    public function queueConsignmentSends(\PDO $dbh) {
         foreach ($this->consignments as $consignment) {
-            $consignment->send();
-            // Save consignment to table
+            $consignment->queue($dbh);
         }
-        $this->closeBatch();
     }
 
     /**
@@ -92,9 +93,11 @@ class Batch
      * @param \PDO $dbh
      * @return boolean
      */
-    private function closeBatch(\PDO $dbh) : bool {
+    public function closeBatch(\PDO $dbh) : bool {
         $this->isOpen = false;
         // Save batch to table
+        $success = true; //($success = migration success)
+        return $success;
     }
 
     /**

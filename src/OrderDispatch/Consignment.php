@@ -32,7 +32,7 @@ class Consignment
      * $courier
      * Courier through which the consignment should be sent
      */
-    private CourierInterface $courier;
+    private AbstractCourier $courier;
 
     /**
      * $consignmentNumber
@@ -65,18 +65,13 @@ class Consignment
 
     /**
      * send
-     * Method to process a request to send the consignment
+     * Method to process a request to put the consignment on the courier consignment list queue
      *
      * @return bool success of send
      */
-    public function send() : bool{
-        try {
-            $this->courier->processConsignment($this);
-        } catch (\Exception $e) {
-            // External service unavailable, complain as loudly as this is business critical
-            return false;
-        }
+    public function queue(\PDO $dbh) {
+        $this->courier->queueConsignment($this);
         $this->hasBeenSent = true;
-        return true;
+        // Save to table
     }
 }
